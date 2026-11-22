@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>06. Varredura de Redes com Nmap — SecVault</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <a href="../index.html" class="sidebar-title">🛡️ SecVault</a>
+      <span class="sidebar-badge">Knowledge Base</span>
+    </div>
+
+    <div class="nav-group-title">Introdução</div>
+    <ul class="nav-links">
+      <li><a href="../index.html">Visão Geral</a></li>
+    </ul>
+
+    <div class="nav-group-title">Fundamentos & Redes</div>
+    <ul class="nav-links">
+      <li><a href="01-principios-cyberseguranca.html">01. Princípios de Segurança</a></li>
+      <li><a href="02-redes-computadores.html">02. Redes de Computadores</a></li>
+      <li><a href="03-usuarios-linux.html">03. Usuários & Permissões Linux</a></li>
+      <li><a href="04-ssh-linux.html">04. SSH & Acesso Seguro</a></li>
+    </ul>
+
+    <div class="nav-group-title">Reconhecimento & Scanning</div>
+    <ul class="nav-links">
+      <li><a href="05-osint-ciberseguranca.html">05. OSINT & Fontes Abertas</a></li>
+      <li><a href="06-varredura-nmap.html" class="active">06. Varredura com Nmap</a></li>
+      <li><a href="07-enumeracao.html">07. Técnicas de Enumeração</a></li>
+    </ul>
+
+    <div class="nav-group-title">Pentest & Exploração</div>
+    <ul class="nav-links">
+      <li><a href="08-fundamentos-pentest.html">08. Fundamentos de Pentest</a></li>
+      <li><a href="09-exploracao-vulnerabilidades.html">09. Exploração de Vulnerabilidades</a></li>
+      <li><a href="10-brute-force-medusa.html">10. Força Bruta & Medusa</a></li>
+      <li><a href="11-pos-exploracao.html">11. Pós-Exploração & Pivoting</a></li>
+    </ul>
+
+    <div class="nav-group-title">Defesa & Inteligência</div>
+    <ul class="nav-links">
+      <li><a href="12-engenharia-social.html">12. Engenharia Social</a></li>
+      <li><a href="13-deepweb-anonimizacao.html">13. Anonimização & Tor</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-wrapper">
+    <div class="content-container">
+      <h1>🔍 Varredura de Redes & Nmap (Network Mapper)</h1>
+      
+      <blockquote>
+        <strong>Visão de Cibersegurança:</strong> A varredura de redes marca a transição do <strong>Reconhecimento Passivo</strong> para o <strong>Reconhecimento Ativo</strong>. O analista interage diretamente com os sistemas para identificar hosts ativos, portas abertas, serviços em execução e versões exatas de softwares (banners).
+      </blockquote>
+
+      <h2>1. Os 3 Objetivos da Varredura</h2>
+      <ol>
+        <li><strong>Descoberta de Hosts (<em>Host Discovery</em>):</strong> Identificar quais computadores, servidores e roteadores estão ligados e respondendo na rede (ex: <code>nmap -sn</code>).</li>
+        <li><strong>Varredura de Portas (<em>Port Scanning</em>):</strong> Descobrir quais portas lógicas (0 a 65535) estão abertas e escutando conexões.</li>
+        <li><strong>Enumeração de Serviços e SO:</strong> Coletar banners e assinaturas que revelam o nome da aplicação, sua versão exata e o sistema operacional subjacente.</li>
+      </ol>
+
+      <h2>2. Estados de Portas no Nmap</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Estado</th>
+            <th>Significado Técnico</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Open (Aberta)</strong></td>
+            <td>Uma aplicação está ativamente aceitando conexões TCP ou pacotes UDP nesta porta.</td>
+          </tr>
+          <tr>
+            <td><strong>Closed (Fechada)</strong></td>
+            <td>A porta responde ao pacote (ex: com um <code>RST</code>), mas não há serviço ouvindo no momento.</td>
+          </tr>
+          <tr>
+            <td><strong>Filtered (Filtrada)</strong></td>
+            <td>Um firewall ou filtro de pacotes está bloqueando as sondagens, impedindo o Nmap de determinar o estado real.</td>
+          </tr>
+          <tr>
+            <td><strong>Unfiltered (Não Filtrada)</strong></td>
+            <td>A porta está acessível, mas o estado exato é indeterminado (comum em varreduras ACK <code>-sA</code>).</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>3. Principais Modos de Scan (TCP SYN vs. Connect)</h2>
+      <pre><code>                       PRINCIPAIS MODOS DE SCAN DO NMAP
+        ┌───────────────────────────────┬───────────────────────────────┐
+        │ SYN Stealth Scan (-sS)        │ TCP Connect Scan (-sT)        │
+        ├───────────────────────────────┼───────────────────────────────┤
+        │ • Envia SYN; recebe SYN-ACK;  │ • Completa o 3-Way Handshake  │
+        │   responde com RST (não fecha)│   (SYN ➔ SYN-ACK ➔ ACK).      │
+        │ • Padrão (requer root/sudo).  │ • Usado quando não tem root.  │
+        │ • Mais furtivo e rápido.      │ • Registrado nos logs do alvo.│
+        └───────────────────────────────┴───────────────────────────────┘</code></pre>
+
+      <h2>4. Cheat Sheet de Comandos Essenciais</h2>
+      <pre><code># Descoberta de hosts ativos em uma sub-rede inteira
+nmap -sn 192.168.1.0/24
+
+# Varrer portas específicas ou intervalo
+nmap -p 22,80,443 192.168.1.50
+nmap -p 1-1000 192.168.1.50
+
+# Varrer TODAS as 65.535 portas (essencial para auditoria completa)
+nmap -p- 192.168.1.50
+
+# Detectar versões de serviços (-sV) e Sistema Operacional (-O)
+nmap -sV -O 192.168.1.50
+
+# Scan Completo/Agressivo (-A: SO, versões, scripts padrão e traceroute)
+nmap -A 192.168.1.50
+
+# Ignorar verificação de ping (essencial caso o alvo bloqueie pacotes ICMP)
+nmap -Pn 192.168.1.50</code></pre>
+
+      <h2>5. Nmap Scripting Engine (NSE) & Evasão</h2>
+      <pre><code># Executar scripts padrão de enumeração
+nmap -sC 192.168.1.50
+
+# Varrer em busca de vulnerabilidades conhecidas (categoria vuln)
+nmap --script=vuln 192.168.1.50
+
+# Scan completo recomendado para auditoria em ambiente de laboratório:
+sudo nmap -sS -sV -sC -p- -T4 192.168.1.50 -oN scan_resultado.txt</code></pre>
+    </div>
+
+    <footer>
+      <p>&copy; 2026 Cybersecurity Knowledge Vault — Mantido por <strong>M0RCEGG0</strong>.</p>
+    </footer>
+  </main>
+
+</body>
+</html>

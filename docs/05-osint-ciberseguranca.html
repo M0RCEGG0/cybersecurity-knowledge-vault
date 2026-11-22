@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>05. OSINT (Open Source Intelligence) — SecVault</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <a href="../index.html" class="sidebar-title">🛡️ SecVault</a>
+      <span class="sidebar-badge">Knowledge Base</span>
+    </div>
+
+    <div class="nav-group-title">Introdução</div>
+    <ul class="nav-links">
+      <li><a href="../index.html">Visão Geral</a></li>
+    </ul>
+
+    <div class="nav-group-title">Fundamentos & Redes</div>
+    <ul class="nav-links">
+      <li><a href="01-principios-cyberseguranca.html">01. Princípios de Segurança</a></li>
+      <li><a href="02-redes-computadores.html">02. Redes de Computadores</a></li>
+      <li><a href="03-usuarios-linux.html">03. Usuários & Permissões Linux</a></li>
+      <li><a href="04-ssh-linux.html">04. SSH & Acesso Seguro</a></li>
+    </ul>
+
+    <div class="nav-group-title">Reconhecimento & Scanning</div>
+    <ul class="nav-links">
+      <li><a href="05-osint-ciberseguranca.html" class="active">05. OSINT & Fontes Abertas</a></li>
+      <li><a href="06-varredura-nmap.html">06. Varredura com Nmap</a></li>
+      <li><a href="07-enumeracao.html">07. Técnicas de Enumeração</a></li>
+    </ul>
+
+    <div class="nav-group-title">Pentest & Exploração</div>
+    <ul class="nav-links">
+      <li><a href="08-fundamentos-pentest.html">08. Fundamentos de Pentest</a></li>
+      <li><a href="09-exploracao-vulnerabilidades.html">09. Exploração de Vulnerabilidades</a></li>
+      <li><a href="10-brute-force-medusa.html">10. Força Bruta & Medusa</a></li>
+      <li><a href="11-pos-exploracao.html">11. Pós-Exploração & Pivoting</a></li>
+    </ul>
+
+    <div class="nav-group-title">Defesa & Inteligência</div>
+    <ul class="nav-links">
+      <li><a href="12-engenharia-social.html">12. Engenharia Social</a></li>
+      <li><a href="13-deepweb-anonimizacao.html">13. Anonimização & Tor</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-wrapper">
+    <div class="content-container">
+      <h1>🕵️‍♂️ OSINT — Open Source Intelligence</h1>
+      
+      <blockquote>
+        <strong>Visão de Cibersegurança:</strong> OSINT é o processo de coletar, analisar e transformar dados disponíveis <strong>publicamente e legalmente</strong> em informações acionáveis de inteligência. Em um Pentest ou avaliação de segurança, o OSINT compõe a etapa de <strong>Reconhecimento Passivo</strong>: você obtém vasto conhecimento sobre o alvo sem enviar um único pacote direto contra os servidores dele.
+      </blockquote>
+
+      <h2>1. O "Pensamento OSINT" (Mindset Investigativo)</h2>
+      <p>A investigação em fontes abertas não consiste em apenas usar ferramentas prontas, mas em seguir uma metodologia lógica:</p>
+      <ol>
+        <li><strong>Ponto de Partida (Pivot Point):</strong> Inicia-se com um dado conhecido simples (ex: nome de domínio, e-mail de um colaborador ou apelido).</li>
+        <li><strong>Correlação e Pivoting:</strong> Usa-se esse dado para encontrar novos pontos de apoio (ex: domínio ➔ IP ➔ certificados SSL ➔ subdomínios ➔ e-mails ➔ redes sociais).</li>
+        <li><strong>Análise Crítica:</strong> Separar "ruído" de inteligência real. Validar se a informação encontrada é verídica e pertence de fato ao alvo.</li>
+      </ol>
+
+      <h2>2. Ferramentas Essenciais de OSINT</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Ferramenta</th>
+            <th>Propósito</th>
+            <th>Link de Acesso</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>OSINT Framework</strong></td>
+            <td>Árvore interativa estruturada reunindo centenas de fontes e serviços de inteligência.</td>
+            <td><a href="https://osintframework.com/" target="_blank">osintframework.com</a></td>
+          </tr>
+          <tr>
+            <td><strong>Shodan</strong></td>
+            <td>Motor de busca global focado em portas abertas, banners e dispositivos IoT.</td>
+            <td><a href="https://www.shodan.io/" target="_blank">shodan.io</a></td>
+          </tr>
+          <tr>
+            <td><strong>Exploit-DB & GHDB</strong></td>
+            <td>Repositório de exploits e catálogo de Google Dorks para encontrar falhas públicas.</td>
+            <td><a href="https://www.exploit-db.com/" target="_blank">exploit-db.com</a></td>
+          </tr>
+          <tr>
+            <td><strong>Maltego</strong></td>
+            <td>Software líder em mineração de dados gráficos e análise de relacionamentos em grafos.</td>
+            <td><a href="https://www.maltego.com/" target="_blank">maltego.com</a></td>
+          </tr>
+          <tr>
+            <td><strong>FOCA</strong></td>
+            <td>Extração e análise forense de metadados em arquivos públicos (PDF, DOCX, XLSX).</td>
+            <td><a href="https://github.com/ElevenPaths/FOCA" target="_blank">GitHub FOCA</a></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>3. Google Hacking (Google Dorks Cheat Sheet)</h2>
+      <p>Técnica que utiliza operadores avançados de pesquisa no Google para indexar e revelar arquivos confidenciais e painéis expostos:</p>
+
+      <pre><code># Encontrar diretórios com listagem aberta de arquivos (Directory Listing):
+site:alvo.com intitle:"index of /"
+
+# Encontrar planilhas com potenciais credenciais ou dados sensíveis:
+site:alvo.com filetype:xls intext:"password"
+
+# Encontrar arquivos de banco de dados ou backups desprotegidos:
+site:alvo.com ext:sql | ext:bkp | ext:env
+
+# Localizar painéis administrativos expostos:
+site:alvo.com inurl:admin OR inurl:login</code></pre>
+
+      <h2>4. Shodan (O "Google dos Dispositivos")</h2>
+      <p>Filtros práticos para busca direcionada no Shodan:</p>
+      <pre><code># Localizar servidores Microsoft RDP (porta 3389) em uma faixa de IPs:
+port:3389 net:192.168.1.0/24
+
+# Encontrar painéis de bancos de dados MongoDB abertos sem autenticação:
+"MongoDB Server Information" port:27017 -authentication
+
+# Localizar servidores Apache de uma organização específica:
+org:"NomeEmpresa" product:"Apache"</code></pre>
+
+      <h2>5. FOCA e a Mineração de Metadados</h2>
+      <p>A extração de metadados em arquivos institucionais públicos revela:</p>
+      <ul>
+        <li>Nomes reais e logins de usuários de rede que criaram ou salvaram os documentos.</li>
+        <li>Caminhos internos de pastas do servidor (ex: <code>C:\Users\joao.silva\Projetos\...</code>).</li>
+        <li>Softwares utilizados e suas respectivas versões desatualizadas.</li>
+        <li>Nomes de impressoras e compartilhamentos SMB corporativos.</li>
+      </ul>
+    </div>
+
+    <footer>
+      <p>&copy; 2026 Cybersecurity Knowledge Vault — Mantido por <strong>M0RCEGG0</strong>.</p>
+    </footer>
+  </main>
+
+</body>
+</html>

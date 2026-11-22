@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cybersecurity Knowledge Vault — Anotações & Pesquisas de Segurança</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <a href="index.html" class="sidebar-title">🛡️ SecVault</a>
+      <span class="sidebar-badge">Knowledge Base</span>
+    </div>
+
+    <div class="nav-group-title">Introdução</div>
+    <ul class="nav-links">
+      <li><a href="index.html" class="active">Visão Geral</a></li>
+    </ul>
+
+    <div class="nav-group-title">Fundamentos & Redes</div>
+    <ul class="nav-links">
+      <li><a href="docs/01-principios-cyberseguranca.html">01. Princípios de Segurança</a></li>
+      <li><a href="docs/02-redes-computadores.html">02. Redes de Computadores</a></li>
+      <li><a href="docs/03-usuarios-linux.html">03. Usuários & Permissões Linux</a></li>
+      <li><a href="docs/04-ssh-linux.html">04. SSH & Acesso Seguro</a></li>
+    </ul>
+
+    <div class="nav-group-title">Reconhecimento & Scanning</div>
+    <ul class="nav-links">
+      <li><a href="docs/05-osint-ciberseguranca.html">05. OSINT & Fontes Abertas</a></li>
+      <li><a href="docs/06-varredura-nmap.html">06. Varredura com Nmap</a></li>
+      <li><a href="docs/07-enumeracao.html">07. Técnicas de Enumeração</a></li>
+    </ul>
+
+    <div class="nav-group-title">Pentest & Exploração</div>
+    <ul class="nav-links">
+      <li><a href="docs/08-fundamentos-pentest.html">08. Fundamentos de Pentest</a></li>
+      <li><a href="docs/09-exploracao-vulnerabilidades.html">09. Exploração de Vulnerabilidades</a></li>
+      <li><a href="docs/10-brute-force-medusa.html">10. Força Bruta & Medusa</a></li>
+      <li><a href="docs/11-pos-exploracao.html">11. Pós-Exploração & Pivoting</a></li>
+    </ul>
+
+    <div class="nav-group-title">Defesa & Inteligência</div>
+    <ul class="nav-links">
+      <li><a href="docs/12-engenharia-social.html">12. Engenharia Social</a></li>
+      <li><a href="docs/13-deepweb-anonimizacao.html">13. Anonimização & Tor</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-wrapper">
+    <div class="content-container">
+      <h1>🛡️ Cybersecurity Knowledge Vault</h1>
+      
+      <blockquote>
+        Repositório pessoal e autoral de anotações técnicas, conceitos essenciais, procedimentos laboratoriais e boas práticas defensivas e ofensivas em segurança da informação.
+      </blockquote>
+
+      <h2>Sobre este Vault</h2>
+      <p>
+        Este portal reúne notas de estudo estruturadas ao longo de dezenas de horas de laboratório prático, leitura de RFCs, análise de vulnerabilidades (CVEs) e simulação de ataques controlados.
+      </p>
+      <p>
+        O objetivo é servir como uma referência rápida e perene para profissionais, estudantes e pesquisadores de cibersegurança que buscam explicações claras, técnicas e sem jargões excessivos.
+      </p>
+
+      <h2>Índice Estruturado de Tópicos</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Módulo</th>
+            <th>Tópicos Abordados</th>
+            <th>Foco</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>01. Princípios</strong></td>
+            <td>Tríade CIA, autenticação multifator (MFA), autorização, não-repúdio.</td>
+            <td>Defensivo / Conceitual</td>
+          </tr>
+          <tr>
+            <td><strong>02. Redes</strong></td>
+            <td>Modelo OSI vs. TCP/IP, protocolos (DNS, HTTP, DHCP), endereçamento IPv4/IPv6.</td>
+            <td>Infraestrutura</td>
+          </tr>
+          <tr>
+            <td><strong>03 & 04. Linux & SSH</strong></td>
+            <td>Gestão de usuários, modelo de permissões octais, hardening de SSH e chaves assimétricas.</td>
+            <td>SysAdmin / Defesa</td>
+          </tr>
+          <tr>
+            <td><strong>05. OSINT</strong></td>
+            <td>Coleta de inteligência em fontes abertas, pegada digital e ferramentas investigativas.</td>
+            <td>Reconhecimento</td>
+          </tr>
+          <tr>
+            <td><strong>06 & 07. Nmap & Enumeração</strong></td>
+            <td>Tipos de varredura (SYN, TCP, UDP), scripts NSE e enumeração de serviços ativos.</td>
+            <td>Auditoria Ativa</td>
+          </tr>
+          <tr>
+            <td><strong>08 & 09. Pentest & Exploração</strong></td>
+            <td>Fases do teste de intrusão (PTES), frameworks como Metasploit e execução de exploits.</td>
+            <td>Red Team</td>
+          </tr>
+          <tr>
+            <td><strong>10. Força Bruta & Medusa</strong></td>
+            <td>Password spraying, ataques online de dicionário e mecanismos de rate limiting.</td>
+            <td>Autenticação</td>
+          </tr>
+          <tr>
+            <td><strong>11. Pós-Exploração</strong></td>
+            <td>Escalada de privilégios (Linux/Windows), coleta de evidências e persistência.</td>
+            <td>Auditoria Avançada</td>
+          </tr>
+          <tr>
+            <td><strong>12 & 13. Engenharia Social & Tor</strong></td>
+            <td>Vetores psicológicos de ataque, roteamento cebola e privacidade operacional (OpSec).</td>
+            <td>Humano & Privacidade</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Aviso de Responsabilidade e Ética</h2>
+      <blockquote class="warning">
+        <strong>⚠️ Ética & Legalidade:</strong> Todo o conteúdo deste portal tem finalidade estritamente educacional e defensiva. A realização de testes de intrusão, varreduras não autorizadas ou exploração de sistemas sem consentimento explícito e formal é ilegal.
+      </blockquote>
+    </div>
+
+    <footer>
+      <p>&copy; 2026 Cybersecurity Knowledge Vault — Mantido por <strong>M0RCEGG0</strong>.</p>
+    </footer>
+  </main>
+
+</body>
+</html>
